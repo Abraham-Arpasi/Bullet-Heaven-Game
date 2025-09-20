@@ -1,13 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Elements")]
     //rb is the rig
     [SerializeField] private InputManager im;
     [SerializeField] private Rigidbody2D rb;
+    //this is so the sprites flip
+    [SerializeField] private Transform Sprites;
+
+    [Header("Settings")]
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float enemyDetectionRadius = 5f;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -18,6 +26,66 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        rb.velocity = new Vector2(im.directionX, im.directionY) * moveSpeed * Time.deltaTime;
+        //rb.velocity = new Vector2(im.directionX, im.directionY) * moveSpeed * Time.deltaTime;
+
+        Vector2 moveDirection = new Vector2(im.directionX, im.directionY);
+        rb.velocity = moveDirection * moveSpeed * Time.deltaTime;
+
+        HandleSpriteFlip(moveDirection);
     }
+    //flips the sprites when eenmy is detected
+    private void HandleSpriteFlip(Vector2 moveDirection)
+    {
+        Enemy nearestEnemy = FindNearestEnemy();
+        if (nearestEnemy != null)
+        {
+            Vector2 enemyDirection = nearestEnemy.transform.position - transform.position;
+            if (enemyDirection.x > 0)
+                SetFacingRight(true);
+            else if (enemyDirection.x < 0)
+                SetFacingRight(false);
+        }
+        else
+        {
+            if (moveDirection.x > 0)
+                SetFacingRight(true);
+            else if (moveDirection.x < 0)
+                SetFacingRight(false);
+        }
     }
+
+    private void SetFacingRight(bool facingRight)
+    {
+        if (Sprites == null) return;
+
+        Vector3 localScale = Sprites.localScale;
+        localScale.x = facingRight ? Mathf.Abs(localScale.x) : -Mathf.Abs(localScale.x);
+        Sprites.localScale = localScale;
+    }
+
+    private Enemy FindNearestEnemy()
+    {
+        Enemy[] enemies = FindObjectsOfType<Enemy>();
+        Enemy nearest = null;
+        float shortestDistance = Mathf.Infinity;
+
+        foreach (Enemy enemy in enemies)
+        {
+            float distance = Vector2.Distance(transform.position, enemy.transform.position);
+            if (distance < shortestDistance && distance <= enemyDetectionRadius)
+            {
+                shortestDistance = distance;
+                nearest = enemy;
+            }
+        }
+
+        return nearest;
+    }
+
+private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, enemyDetectionRadius);
+    }
+
+}
