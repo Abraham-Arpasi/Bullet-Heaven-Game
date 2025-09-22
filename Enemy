@@ -36,6 +36,10 @@ public class Enemy : MonoBehaviour
     [Header("Actions")]
     public static Action<int, Vector2> onDamageTaken;
 
+    [Header("Range Enemy")]
+    [SerializeField] private bool isRangeEnemy;
+    [SerializeField] private float rangePlayerDetectionRadius;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -85,10 +89,15 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!enemyRenderer.enabled)
+            return;
+
         if (attackTimer >= attackDelay)
             TryAttack();
         else
             Wait();
+
+        movement.FollowPlayer();
     }
 
     private void Wait()
@@ -100,10 +109,15 @@ public class Enemy : MonoBehaviour
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
-        if (distanceToPlayer <= playerDetectionRadius)
+        if (!isRangeEnemy)
         {
-            Attack();
-            //EnemyDead();
+            if (distanceToPlayer <= playerDetectionRadius)
+                Attack();
+        }
+        else
+        {
+            if (distanceToPlayer <= rangePlayerDetectionRadius)
+                Attack();
         }
     }
 
@@ -112,7 +126,10 @@ public class Enemy : MonoBehaviour
         Debug.Log("Dealing " + damage + " damage to the player");
         attackTimer = 0;
 
-        player.TakeDamage(damage);
+        if (!isRangeEnemy)
+            player.TakeDamage(damage);
+        else
+            Debug.Log("Shoot");
     }
 
     public void TakeDamage(int damage)
@@ -140,5 +157,8 @@ public class Enemy : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, playerDetectionRadius);
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, rangePlayerDetectionRadius);
     }
 }
