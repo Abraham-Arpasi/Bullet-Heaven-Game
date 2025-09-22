@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class RangeEnemyAttack : MonoBehaviour
+{
+    [Header("Elements")]
+    private Player player;
+    [SerializeField] private Transform shootingPoint;
+    [SerializeField] private GameObject bulletPrefab;
+
+    [Header("Settings")]
+    [SerializeField] private int damage;
+    [SerializeField] private float attackFrequency;
+    private float attackDelay;
+    private float attackTimer;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        attackDelay = 1f / attackFrequency;
+        attackTimer = attackDelay;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    public void StorePlayer(Player player)
+    {
+        this.player = player;
+    }
+
+    public void AutoAim()
+    {
+        ManageShooting();
+    }
+
+    private void ManageShooting()
+    {
+        attackTimer += Time.deltaTime;
+
+        if (attackTimer >= attackDelay) 
+        {
+            attackTimer = 0;
+            Shoot();
+        }
+    }
+
+    private void Shoot()
+    {
+        Vector2 direction = (player.transform.position - shootingPoint.position).normalized;
+
+
+    }
+}
