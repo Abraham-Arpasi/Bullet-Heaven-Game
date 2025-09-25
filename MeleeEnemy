@@ -1,95 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
-using System;
 
 [RequireComponent(typeof(EnemyMovement))]
 public class MeleeEnemy : Enemy
 {
-    [Header("Components")]
-    private EnemyMovement movement;
-
-    [Header("Health")]
-    [SerializeField] private int maxHealth;
-    private int health;
-    [SerializeField] private TextMeshPro healthText;
-
-    [Header("Elements")]
-    private Player player;
-
-    [Header("Spawn Sequene")]
-    [SerializeField] private SpriteRenderer enemyRenderer;
-    [SerializeField] private SpriteRenderer spawnIndicator;
-    private bool hasSpawned;
-
     [Header("Attack")]
     [SerializeField] private int damage;
     [SerializeField] private float attackFrequency;
-    [SerializeField] private float playerDetectionRadius;
     private float attackDelay;
     private float attackTimer;
-
-    [Header("Effects")]
-    [SerializeField] private ParticleSystem enemyBloodParticles;
-
-    [Header("Actions")]
-    public static Action<int, Vector2> onDamageTaken;
 
     [Header("Range Enemy")]
     [SerializeField] private bool isRangeEnemy;
     [SerializeField] private float rangePlayerDetectionRadius;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
-        health = maxHealth;
-        healthText.text = health.ToString();
-
-        movement = GetComponent<EnemyMovement>();
-
-        player = FindFirstObjectByType<Player>();
-
-        if (player == null)
-        {
-            Debug.LogWarning("no player found, auto");
-            Destroy(gameObject);
-        }
-
-        StartSpawnSequence();
+        base.Start();
 
         attackDelay = 1f / attackFrequency;
-    }
-
-    private void StartSpawnSequence()
-    {
-        SetRendererVisibility(false);
-
-        Vector3 targetScale = spawnIndicator.transform.localScale * 1.2f;
-        //scales the circle indicator 4 times in a loop down and up and after its done spawns the enemy.
-        LeanTween.scale(spawnIndicator.gameObject, targetScale, 0.3f)
-            .setLoopPingPong(4)
-            .setOnComplete(SpawnSequenceCompleted);
-    }
-
-    private void SpawnSequenceCompleted()
-    {
-        SetRendererVisibility(true);
-        hasSpawned = true;
-
-        movement.StorePlayer(player);
-    }
-
-    private void SetRendererVisibility(bool visibility)
-    {
-        enemyRenderer.enabled = visibility;
-        spawnIndicator.enabled = !visibility;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!enemyRenderer.enabled)
+        if (!CanAttack())
             return;
 
         if (attackTimer >= attackDelay)
@@ -130,27 +65,6 @@ public class MeleeEnemy : Enemy
             player.TakeDamage(damage);
         else
             Debug.Log("Shoot");
-    }
-
-    public void TakeDamage(int damage)
-    {
-        int realDamage = Mathf.Min(damage, health);
-        health -= realDamage;
-
-        healthText.text = health.ToString();
-
-        onDamageTaken?.Invoke(damage, transform.position);
-
-        if (health <= 0)
-            EnemyDead();
-    }
-
-    private void EnemyDead()
-    {
-        enemyBloodParticles.transform.SetParent(null);
-        enemyBloodParticles.Play();
-
-        Destroy(gameObject);
     }
 
     private void OnDrawGizmos()
