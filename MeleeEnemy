@@ -1,103 +1,78 @@
-using System;
-using TMPro;
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour
+[RequireComponent(typeof(EnemyMovement))]
+public class MeleeEnemy : Enemy
 {
-    [Header("Components")]
-    protected EnemyMovement movement;
-
-    [Header("Health")]
-    [SerializeField] protected int maxHealth;
-    protected int health;
-    [SerializeField] protected TextMeshPro healthText;
-
-    [Header("Elements")]
-    protected Player player;
-
-    [Header("Spawn Sequene")]
-    [SerializeField] protected SpriteRenderer enemyRenderer;
-    [SerializeField] protected SpriteRenderer spawnIndicator;
-    protected bool hasSpawned;
-
     [Header("Attack")]
-    [SerializeField] protected float playerDetectionRadius;
+    [SerializeField] private int damage;
+    [SerializeField] private float attackFrequency;
+    private float attackDelay;
+    private float attackTimer;
 
-    [Header("Effects")]
-    [SerializeField] protected ParticleSystem enemyBloodParticles;
-
-    [Header("Actions")]
-    protected static Action<int, Vector2> onDamageTaken;
+    [Header("Range Enemy")]
+    [SerializeField] private bool isRangeEnemy;
+    [SerializeField] private float rangePlayerDetectionRadius;
 
     // Start is called before the first frame update
-    protected virtual void Start()
+    protected override void Start()
     {
-        health = maxHealth;
-        healthText.text = health.ToString();
+        base.Start();
 
-        movement = GetComponent<EnemyMovement>();
-
-        player = FindFirstObjectByType<Player>();
-
-        if (player == null)
-        {
-            Debug.LogWarning("no player found, auto");
-            Destroy(gameObject);
-        }
-
-        StartSpawnSequence();
-    }
-
-    private void StartSpawnSequence()
-    {
-        SetRendererVisibility(false);
-
-        Vector3 targetScale = spawnIndicator.transform.localScale * 1.2f;
-        //scales the circle indicator 4 times in a loop down and up and after its done spawns the enemy.
-        LeanTween.scale(spawnIndicator.gameObject, targetScale, 0.3f)
-            .setLoopPingPong(4)
-            .setOnComplete(SpawnSequenceCompleted);
-    }
-
-    private void SpawnSequenceCompleted()
-    {
-        SetRendererVisibility(true);
-        hasSpawned = true;
-
-        movement.StorePlayer(player);
-    }
-
-    private void SetRendererVisibility(bool visibility)
-    {
-        enemyRenderer.enabled = visibility;
-        spawnIndicator.enabled = !visibility;
+        attackDelay = 1f / attackFrequency;
     }
 
     // Update is called once per frame
-    protected bool CanAttack()
+    void Update()
     {
-        return enemyRenderer.enabled;
+        if (!CanAttack())
+            return;
+
+        if (attackTimer >= attackDelay)
+            TryAttack();
+        else
+            Wait();
+
+        movement.FollowPlayer();
     }
 
-    public void TakeDamage(int damage)
+    private void Wait()
     {
-        int realDamage = Mathf.Min(damage, health);
-        health -= realDamage;
-
-        healthText.text = health.ToString();
-
-        onDamageTaken?.Invoke(damage, transform.position);
-
-        if (health <= 0)
-            EnemyDead();
+        attackTimer += Time.deltaTime;
     }
 
-    private void EnemyDead()
+    private void TryAttack()
     {
-        enemyBloodParticles.transform.SetParent(null);
-        enemyBloodParticles.Play();
+        float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
-        Destroy(gameObject);
+        if (!isRangeEnemy)
+        {
+            if (distanceToPlayer <= playerDetectionRadius)
+                Attack();
+        }
+        else
+        {
+            if (distanceToPlayer <= rangePlayerDetectionRadius)
+                Attack();
+        }
     }
 
+    private void Attack()
+    {
+        Debug.Log("Dealing " + damage + " damage to the player");
+        attackTimer = 0;
+
+        if (!isRangeEnemy)
+            player.TakeDamage(damage);
+        else
+            Debug.Log("Shoot");
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, playerDetectionRadius);
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireSphere(transform.position, rangePlayerDetectionRadius);
+    }
 }
