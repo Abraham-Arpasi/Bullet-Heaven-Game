@@ -9,18 +9,20 @@ public class Bullet : MonoBehaviour
     private Rigidbody2D rig;
     private RangeEnemyAttack rangeEnemyAttack;
     private Collider2D collider;
+    private RangeWeapon rangeWeapon;
 
     [Header("Settings")]
     private int damage;
     [SerializeField] private float moveSpeed;
     [SerializeField] private LayerMask enemyMask;
+    private Enemy target;
 
     private void Awake()
     {
         rig = GetComponent<Rigidbody2D>();
         collider = GetComponent<Collider2D>();
 
-//        StartCoroutine(ReleaseCoroutine());
+        StartCoroutine(ReleaseCoroutine());
     }
 
     // Start is called before the first frame update
@@ -35,6 +37,18 @@ public class Bullet : MonoBehaviour
         
     }
 
+    IEnumerator ReleaseCoroutine()
+    {
+        yield return new WaitForSeconds(5);
+
+        rangeWeapon.ReleaseBullet(this);
+    }
+
+    public void Configure(RangeWeapon rangeWeapon)
+    {
+        this.rangeWeapon = rangeWeapon;
+    }
+
     public void Shoot(int damage, Vector2 direction)
     {
         this.damage = damage;
@@ -43,12 +57,26 @@ public class Bullet : MonoBehaviour
         rig.velocity = direction * moveSpeed;
     }
 
+    public void Reload()
+    {
+        target = null;
+
+        rig.velocity = Vector2.zero;
+        this.collider.enabled = true;
+    }
+
     private void OnTriggerEnter2D(Collider2D collider)
     {
+        if (target != null)
+            return;
+
        if(IsInLayerMask(collider.gameObject.layer, enemyMask))
         {
-            Attack(collider.GetComponent<Enemy>());
-            Destroy(gameObject);
+            target = collider.GetComponent<Enemy>();
+            StopCoroutine(ReleaseCoroutine());
+            
+            Attack(target);
+            rangeWeapon.ReleaseBullet(this);
         } 
     }
 
@@ -61,4 +89,5 @@ public class Bullet : MonoBehaviour
     {
         return (layerMask.value & (1 << layer)) != 0;
     }
+
 }
