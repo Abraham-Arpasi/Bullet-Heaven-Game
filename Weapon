@@ -22,15 +22,15 @@ public class Weapon : MonoBehaviour
     [SerializeField] private LayerMask enemyMask;
 
     [Header("Attack")]
-    [SerializeField] private int damage;
-    [SerializeField] private float attackDelay;
+    [SerializeField] protected int damage;
+    [SerializeField] protected float attackDelay;
     [SerializeField] private Animator anim;
 
-    private float attackTimer;
+    protected float attackTimer;
     private List<Enemy> damagedEnemies = new List<Enemy>();
 
     [Header("Animations")]
-    [SerializeField] private float aimLerp;
+    [SerializeField] protected float aimLerp;
     
     // Start is called before the first frame update
     void Start()
@@ -125,7 +125,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private Enemy GetClosestEnemy()
+    protected Enemy GetClosestEnemy()
     {
         Enemy closestEnemy = null;
         Collider2D[] enemies = Physics2D.OverlapCircleAll(transform.position, range, enemyMask);
@@ -160,4 +160,3 @@ public class Weapon : MonoBehaviour
         Gizmos.DrawWireSphere(hitBoxTransform.position, hitBoxRadius);
     }
 }
-
