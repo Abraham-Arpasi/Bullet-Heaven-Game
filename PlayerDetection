@@ -1,0 +1,21 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerDetection : MonoBehaviour
+{
+    [Header("Collider")]
+    [SerializeField] private Collider2D playerCollider;
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if(collider.TryGetComponent(out Candy candy))
+        {
+            if (!collider.IsTouching(playerCollider))
+            {
+                return;
+            }
+
+            Destroy(candy);
+        }
+    }
+}
