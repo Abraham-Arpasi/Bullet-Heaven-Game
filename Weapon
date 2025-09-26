@@ -4,30 +4,16 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    enum State
-    {
-        Idle, 
-        Attack
-    }
-
-    private State state;
-
-    [Header("Elements")]
-    [SerializeField] private Transform hitBoxTransform;
-    [SerializeField] private BoxCollider2D hitBoxCollider;
-    [SerializeField] private float hitBoxRadius;
-
     [Header("Settings")]
     [SerializeField] private float range;
-    [SerializeField] private LayerMask enemyMask;
+    [SerializeField] protected LayerMask enemyMask;
 
     [Header("Attack")]
     [SerializeField] protected int damage;
     [SerializeField] protected float attackDelay;
-    [SerializeField] private Animator anim;
+    [SerializeField] protected Animator anim;
 
     protected float attackTimer;
-    private List<Enemy> damagedEnemies = new List<Enemy>();
 
     [Header("Animations")]
     [SerializeField] protected float aimLerp;
@@ -35,94 +21,13 @@ public class Weapon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        state = State.Idle;
+       
     }
 
     // Update is called once per frame
     void Update()
     {
-        switch(state)
-        {
-            case State.Idle:
-                AutoAim();
-                break;
-
-            case State.Attack:
-                Attacking();
-                break;
-        }
-
-        Attack();
-    }
-
-    private void AutoAim()
-    {
-        Enemy closestEnemy = GetClosestEnemy();
-
-        Vector2 targetUpVector = Vector3.up;
-
-        if (closestEnemy != null)
-        {
-            targetUpVector = (closestEnemy.transform.position - transform.position).normalized;
-            transform.up = targetUpVector;
-            ManageAttackTimer();
-        }
-
-        transform.up = Vector3.Lerp(transform.up, targetUpVector, Time.deltaTime * aimLerp);
-        AttackTimer();
-    }
-
-    private void ManageAttackTimer()
-    {
-        if(attackTimer >= attackDelay)
-        {
-            attackTimer = 0;
-            StartAttack();
-        }
-    }
-
-    private void AttackTimer()
-    {
-        attackTimer += Time.deltaTime;
-    }
-
-    private void StartAttack()
-    {
-        anim.Play("Attack");
-        state = State.Attack;
-
-        damagedEnemies.Clear();
-
-        anim.speed = 1f / attackDelay;
-    }
-
-    private void Attacking()
-    {
-        Attack();
-    }
-
-    private void StopAttack()
-    {
-        state = State.Idle;
-        damagedEnemies.Clear();
-    }
-
-    private void Attack()
-    {
-       // Collider2D[] enemies = Physics2D.OverlapCircleAll(hitBoxTransform.position, hitBoxRadius, enemyMask);
-        Collider2D[] enemies = Physics2D.OverlapBoxAll(hitBoxTransform.position, hitBoxCollider.bounds.size, hitBoxTransform.localEulerAngles.z, enemyMask);
-
-        for (int i = 0; i < enemies.Length; i++)
-        {
-            Enemy enemy = enemies[i].GetComponent<Enemy>();
-
-            if (!damagedEnemies.Contains(enemy))
-            {
-                enemy.TakeDamage(damage);
-                damagedEnemies.Add(enemy);
-            }
-
-        }
+       
     }
 
     protected Enemy GetClosestEnemy()
@@ -151,12 +56,23 @@ public class Weapon : MonoBehaviour
         return closestEnemy;
     }
 
+    protected int GetDamage(out bool isCriticalHit)
+    {
+        isCriticalHit = false;
+
+        if (Random.Range(0, 100) <= 50)
+        {
+            isCriticalHit = true;
+            return damage * 2;
+        }
+
+        return damage;
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(transform.position, range);
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(hitBoxTransform.position, hitBoxRadius);
     }
 }
