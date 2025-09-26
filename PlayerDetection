@@ -2,20 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Player))]
 public class PlayerDetection : MonoBehaviour
 {
     [Header("Collider")]
     [SerializeField] private Collider2D playerCollider;
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if(collider.TryGetComponent(out Candy candy))
+        if (collider.TryGetComponent(out ICollectable Collectable))
         {
             if (!collider.IsTouching(playerCollider))
             {
                 return;
             }
 
-            Destroy(candy);
+            Collectable.Collect(GetComponent<Player>());
         }
+
     }
 }
