@@ -21,9 +21,15 @@ public class DamageText : MonoBehaviour
         
     }
 
-    public void Animate(int damage)
+    public void Animate(int damage, bool isCriticalHit)
     {
+        Debug.Log("is Critical Hit :" + isCriticalHit);
+
         damageText.text = damage.ToString();
+        damageText.color = isCriticalHit ? Color.yellow : Color.white;
+
+        damageText.fontMaterial.SetColor("_FaceColor", isCriticalHit ? Color.yellow : Color.white);
+
         anim.Play("Animate");
     }
 }
