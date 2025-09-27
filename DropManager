@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Pool;
 using Random = UnityEngine.Random;
 
 public class DropManager : MonoBehaviour
@@ -10,20 +11,30 @@ public class DropManager : MonoBehaviour
     [SerializeField] private Candy candyPrefab;
     [SerializeField] private Cash cashPrefab;
 
+    [Header("Pooling")]
+    [SerializeField] private ObjectPool<Candy> candyPool;
+    [SerializeField] private ObjectPool<Cash> cashPool;
+
     private void Awake()
     {
         Enemy.onEnemyDead += EnemyDeadCallback;
+        Candy.onCollected += ReleaseCandy;
+        Cash.onCollected += ReleaseCash;
     }
 
     private void OnDestroy()
     {
-        Enemy.onEnemyDead += EnemyDeadCallback;
+        Enemy.onEnemyDead -= EnemyDeadCallback;
+        Candy.onCollected -= ReleaseCandy;
+        Cash.onCollected -= ReleaseCash;
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        candyPool = new ObjectPool<Candy>(CandyCreateFunction, CandyActionOnGet, CandyActionOnRelease, CandyActionOnDestroy);
+        cashPool  = new ObjectPool<Cash>(CashCreateFunction, CashActionOnGet, CashActionOnRelease, CashActionOnDestroy);
+
     }
 
     // Update is called once per frame
@@ -32,13 +43,62 @@ public class DropManager : MonoBehaviour
         
     }
 
+    private Candy CandyCreateFunction()
+    {
+        return Instantiate(candyPrefab, transform);
+    }
+
+    private void CandyActionOnGet(Candy candy)
+    {
+        candy.gameObject.SetActive(true);
+    }
+
+    private void CandyActionOnRelease(Candy candy)
+    {
+        candy.gameObject.SetActive(false);
+    }
+
+    private void CandyActionOnDestroy(Candy candy)
+    {
+        Destroy(candy.gameObject);
+    }
+
+    private Cash CashCreateFunction()
+    {
+        return Instantiate(cashPrefab, transform);
+    }
+
+    private void CashActionOnGet(Cash cash)
+    {
+        cash.gameObject.SetActive(true);
+    }
+
+    private void CashActionOnRelease(Cash cash)
+    {
+        cash.gameObject.SetActive(false);
+    }
+
+    private void CashActionOnDestroy(Cash cash)
+    {
+        Destroy(cash.gameObject);
+    }
+
+
     private void EnemyDeadCallback(Vector2 enemyPosition)
     {
         bool shouldSpawnCash = Random.Range(0, 101) <= 20;
 
-        GameObject droppable = shouldSpawnCash ? cashPrefab.gameObject : candyPrefab.gameObject;
+        DroppableCurrency droppable = shouldSpawnCash ? cashPool.Get() : candyPool.Get();
+        droppable.transform.position = enemyPosition;
+    }
 
-        GameObject droppableInstance = Instantiate(droppable, enemyPosition, Quaternion.identity, transform);
-        droppableInstance.name = "Droppable " + Random.Range(0, 5000);
+    private void ReleaseCandy(Candy candy)
+    {
+        candyPool.Release(candy);
+    }
+
+    private void ReleaseCash(Cash cash)
+    {
+        cashPool.Release(cash);
     }
 }
