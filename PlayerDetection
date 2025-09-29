@@ -7,17 +7,21 @@ public class PlayerDetection : MonoBehaviour
 {
     [Header("Collider")]
     [SerializeField] private Collider2D playerCollider;
+    [SerializeField] private Collider2D playerCollider2;
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.TryGetComponent(out ICollectable Collectable))
+        if(collider.TryGetComponent(out ICollectable Collectable))
         {
             if (!collider.IsTouching(playerCollider))
             {
                 return;
             }
+            if (collider.IsTouching(playerCollider2))
+            {
+                Collectable.Collect2(GetComponent<Player>());
+            }
 
             Collectable.Collect(GetComponent<Player>());
         }
-
     }
 }
