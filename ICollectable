@@ -6,5 +6,6 @@ public interface ICollectable
 {
     public void Collect(Player player);
 
+    public void Collect2(Player player2);
 
 }
