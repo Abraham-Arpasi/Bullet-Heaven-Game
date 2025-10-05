@@ -26,8 +26,15 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public void WaveCompleteCallback()
+    public void WaveCompletedCallback()
     {
+        if (Player.instance.HasLeveledUp())
+        {
 
+        }
+        else
+        {
+
+        }
     }
 }
