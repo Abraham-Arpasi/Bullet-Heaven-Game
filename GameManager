@@ -22,7 +22,16 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.MENU);
     }
 
-    public void StartGame() => SetGameState(GameState.GAME);
+    public void StartGame()
+    {
+        SetGameState(GameState.GAME);
+    }
+
+    public void StartShop()
+    {
+        SetGameState(GameState.SHOP);
+    }
+
 
     // Update is called once per frame
     void Update()
@@ -46,7 +55,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            SetGameState(GameState.SHOP);
+            SetGameState(GameState.WAVETRANSITION);
         }
     }
 }
