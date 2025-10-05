@@ -102,7 +102,7 @@ public class WaveManager : MonoBehaviour
             ui.UpdateWaveText("Stage Completed");
         }
         else
-            GameManager.instance.WaveCompleteCallback();
+            GameManager.instance.WaveCompletedCallback();
     }
 
     private void DefeatAllEnemies()
