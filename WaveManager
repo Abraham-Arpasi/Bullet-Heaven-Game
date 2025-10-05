@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(WaveManager))]
-public class WaveManager : MonoBehaviour
+public class WaveManager : MonoBehaviour, IGameStateListener
 {
     [Header("Elements")]
     [SerializeField] private List<BoxCollider2D> spawners = new List<BoxCollider2D>();
@@ -28,7 +28,7 @@ public class WaveManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartWave(currentWaveIndex);
+       
     }
 
     // Update is called once per frame
@@ -105,6 +105,11 @@ public class WaveManager : MonoBehaviour
             GameManager.instance.WaveCompletedCallback();
     }
 
+    private void StartNextWave()
+    {
+        StartWave(currentWaveIndex);
+    }
+
     private void DefeatAllEnemies()
     {
        // transform.Clear();
@@ -120,6 +125,16 @@ public class WaveManager : MonoBehaviour
         float y = Random.Range(bounds.min.y, bounds.max.y);
 
         return new Vector2(x, y);
+    }
+
+    public void GameStateChangedCallback(GameState gameState)
+    {
+        switch (gameState)
+        {
+            case GameState.GAME :
+                StartNextWave();
+                break;
+        }
     }
 }
 
