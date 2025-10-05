@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,6 +28,11 @@ public class GameManager : MonoBehaviour
         SetGameState(GameState.GAME);
     }
 
+    public void StartWeaponSelection()
+    {
+        SetGameState(GameState.WEAPONSELECTION);
+    }
+
     public void StartShop()
     {
         SetGameState(GameState.SHOP);
@@ -45,6 +51,9 @@ public class GameManager : MonoBehaviour
 
         foreach(IGameStateListener gameStateListener in gameStateListeners)
             gameStateListener.GameStateChangedCallback(gameState);
+
+        if (gameState == GameState.GAMEOVER)
+            ManageGameover();
     }
 
     public void WaveCompletedCallback()
@@ -57,6 +66,11 @@ public class GameManager : MonoBehaviour
         {
             SetGameState(GameState.WAVETRANSITION);
         }
+    }
+
+    public void ManageGameover()
+    {
+        LeanTween.delayedCall(2, () => SceneManager.LoadScene(0));
     }
 }
 
