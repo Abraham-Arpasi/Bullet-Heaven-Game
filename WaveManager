@@ -102,12 +102,12 @@ public class WaveManager : MonoBehaviour
             ui.UpdateWaveText("Stage Completed");
         }
         else
-            StartWave(currentWaveIndex);
+            GameManager.instance.WaveCompleteCallback();
     }
 
     private void DefeatAllEnemies()
     {
-        transform.Clear();
+       // transform.Clear();
     }
 
     private Vector2 GetSpawnPosition()
