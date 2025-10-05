@@ -1,0 +1,54 @@
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class PlayerHealth : MonoBehaviour
+{
+    [Header("Settings")]
+    private int health;
+    [SerializeField] private int maxHealth;
+
+    [Header("Elements")]
+    [SerializeField] private Slider healthBar;
+    [SerializeField] private TextMeshProUGUI healthText;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        health = maxHealth;
+
+        healthBar.value = 1;
+        healthText.text = health + " / " + maxHealth;
+        Debug.Log("Health initalized to : " + health);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void TakeDamage(int damage)
+    {
+        int realDamage = Mathf.Min(damage, health);
+        health -= realDamage;
+
+        float healthBarValue = (float)health / maxHealth;
+        healthBar.value = healthBarValue;
+        healthText.text = health + " / " + maxHealth;
+
+        Debug.Log("Health : " + health);
+
+        if (health <= 0)
+        {
+            Dead();
+        }
+    }
+    private void Dead()
+    {
+        GameManager.instance.SetGameState(GameState.GAMEOVER);
+    }
+}
