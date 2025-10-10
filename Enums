@@ -14,5 +14,19 @@ public enum GameState
     PAUSE
 }
 
-
+public enum Stat
+{
+    Attack,
+    AttackSpeed,
+    CriticalChance,
+    CriticalDamage,
+    MoveSpeed,
+    MaxHealth,
+    Range,
+    HealthRecoverySpeed,
+    Armour,
+    Luck,
+    Dodge,
+    LifeSteal
+}
 
