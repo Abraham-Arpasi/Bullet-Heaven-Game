@@ -1,0 +1,40 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class WaveTransitionManager : MonoBehaviour, IGameStateListener
+{
+    [Header("Elements")]
+    [SerializeField] private Button[] upgradeContainers;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void GameStateChangedCallback(GameState gameState)
+    {
+        switch (gameState)
+        {
+            case GameState.WAVETRANSITION:
+                ConfigureUpgradeContainers();
+                break;
+        }
+    }
+
+    private void ConfigureUpgradeContainers()
+    {
+        for (int i = 0; i < upgradeContainers.Length; i++)
+        {
+            upgradeContainers[i].transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Upgrade" + i;
+        }
+    }
+}
