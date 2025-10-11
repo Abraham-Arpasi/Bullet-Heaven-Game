@@ -12,7 +12,9 @@ public class PlayerStatsManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+        addends.Add(Stat.MaxHealth, 10);
+
+        UpdatePlayerStats();
     }
 
     // Update is called once per frame
@@ -32,11 +34,16 @@ public class PlayerStatsManager : MonoBehaviour
 
     }
 
+    public float GetStatValue(Stat stat)
+    {
+        return addends[stat];
+    }
+
     private void UpdatePlayerStats()
     {
-        IEnumerable<IPlayerStatsDependency> playerStatsDependency = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IPlayerStatsDependency>();
+        IEnumerable<IPlayerStatsDependency> playerStatsDependencies = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IPlayerStatsDependency>();
 
-        foreach (IPlayerStatsDependency dependency in playerStatsDependency)
+        foreach (IPlayerStatsDependency dependency in playerStatsDependencies)
             dependency.UpdateStats(this);
     }
 }
