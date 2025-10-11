@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "Character Data", menuName = "Scriptable Objects/New Character Data", order = 0)]
+public class CharacterDataSO : ScriptableObject
+{
+    [field: SerializeField] public string Name { get; private set; }
+    [field: SerializeField] public Sprite sprite { get; private set; }
+    [field: SerializeField] public int PurchasePrice { get; private set; }
+    [field: SerializeField] private float attack;
+    [field: SerializeField] private float attackSpeed;
+    [field: SerializeField] private float criticalChance;
+    [field: SerializeField] private float criticalDamage;
+    [field: SerializeField] private float moveSpeed;
+    [field: SerializeField] private float maxHealth;
+    [field: SerializeField] private float healthRecovery;
+    [field: SerializeField] private float range;
+    [field: SerializeField] private float armour;
+    [field: SerializeField] private float luck;
+    [field: SerializeField] private float dodge;
+    [field: SerializeField] private float lifeSteal;
+}
