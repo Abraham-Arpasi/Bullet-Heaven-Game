@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IPlayerStatsDependency
 {
     [Header("Elements")]
     //rb is the rig
@@ -13,7 +13,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform Sprites;
 
     [Header("Settings")]
-    [SerializeField] private float moveSpeed;
+    [SerializeField] private float baseMoveSpeed;
+    private float moveSpeed;
     [SerializeField] private float enemyDetectionRadius = 5f;
 
     // Start is called before the first frame update
@@ -36,7 +37,7 @@ public class PlayerController : MonoBehaviour
     //flips the sprites when eenmy is detected
     private void HandleSpriteFlip(Vector2 moveDirection)
     {
-        Enemy nearestEnemy = FindNearestEnemy();
+        MeleeEnemy nearestEnemy = FindNearestEnemy();
         if (nearestEnemy != null)
         {
             Vector2 enemyDirection = nearestEnemy.transform.position - transform.position;
@@ -63,13 +64,13 @@ public class PlayerController : MonoBehaviour
         Sprites.localScale = localScale;
     }
 
-    private Enemy FindNearestEnemy()
+    private MeleeEnemy FindNearestEnemy()
     {
-        Enemy[] enemies = FindObjectsOfType<Enemy>();
-        Enemy nearest = null;
+        MeleeEnemy[] enemies = FindObjectsOfType<MeleeEnemy>();
+        MeleeEnemy nearest = null;
         float shortestDistance = Mathf.Infinity;
 
-        foreach (Enemy enemy in enemies)
+        foreach (MeleeEnemy enemy in enemies)
         {
             float distance = Vector2.Distance(transform.position, enemy.transform.position);
             if (distance < shortestDistance && distance <= enemyDetectionRadius)
@@ -88,4 +89,9 @@ private void OnDrawGizmosSelected()
         Gizmos.DrawWireSphere(transform.position, enemyDetectionRadius);
     }
 
+    public void UpdateStats(PlayerStatsManager playerStatsManager)
+    {
+        float moveSpeedPercent = playerStatsManager.GetStatValue(Stat.MoveSpeed) / 100;
+        moveSpeed = baseMoveSpeed * (1 + moveSpeedPercent);
+    }
 }
