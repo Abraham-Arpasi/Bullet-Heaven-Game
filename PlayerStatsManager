@@ -1,0 +1,43 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+public class PlayerStatsManager : MonoBehaviour
+{
+    [Header("Settings")]
+    //private List<StatData> statDatas = new List<StatData>();
+     Dictionary<Stat, float> addends = new Dictionary<Stat, float>();
+
+    // Start is called before the first frame update
+    void Start()
+    {
+       
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void AddPlayerStat(Stat stat, float value)
+    {
+        if (addends.ContainsKey(stat))
+            addends[stat] += value;
+        else
+            Debug.LogError($"The key {stat} has not been found");
+
+        UpdatePlayerStats();
+
+    }
+
+    private void UpdatePlayerStats()
+    {
+        IEnumerable<IPlayerStatsDependency> playerStatsDependency = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IPlayerStatsDependency>();
+
+        foreach (IPlayerStatsDependency dependency in playerStatsDependency)
+            dependency.UpdateStats(this);
+    }
+}
+
