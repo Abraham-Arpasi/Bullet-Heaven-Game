@@ -18,7 +18,7 @@ public class CharacterDataSO : ScriptableObject
     [field: SerializeField] private float range;
     [field: SerializeField] private float armour;
     [field: SerializeField] private float luck;
-    [field: SerializeField] private float dodge;
+   // [field: SerializeField] private float dodge;
     [field: SerializeField] private float lifeSteal;
 
     public Dictionary<Stat, float> BaseStats
@@ -36,7 +36,7 @@ public class CharacterDataSO : ScriptableObject
                 {Stat.HealthRecovery, healthRecovery },
                 {Stat.Range, range },
                 {Stat.Luck, luck },
-                {Stat.Dodge, dodge },
+                //{Stat.Dodge, dodge },
                 {Stat.LifeSteal, luck },
             };
         }
