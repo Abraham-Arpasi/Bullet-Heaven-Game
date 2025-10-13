@@ -33,4 +33,13 @@ public class WeaponDataSO : ScriptableObject
 
         private set { }
     }
+
+    public float GetStatValue(Stat stat)
+    {
+        foreach (KeyValuePair<Stat, float> kvp in BaseStats)
+            if (kvp.Key == stat)
+                return kvp.Value;
+
+        return 0;
+    }
 }
