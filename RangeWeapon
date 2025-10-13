@@ -94,6 +94,14 @@ public class RangeWeapon : Weapon
 
     public override void UpdateStats(PlayerStatsManager playerStatsManager)
     {
-        damage = (int)(baseDamage * (1 + (weaponData.BaseStats[Stat.Attack] / 100) + playerStatsManager.GetStatValue(Stat.Attack) / 100 ));
+        ConfigureStats();
+
+        damage = (int)(damage * (1 + playerStatsManager.GetStatValue(Stat.Attack) / 100 ));
+        attackDelay /= 1 + (playerStatsManager.GetStatValue(Stat.AttackSpeed) / 100);
+
+        criticalChance = Mathf.RoundToInt(criticalChance * (1 + playerStatsManager.GetStatValue(Stat.CriticalChance) / 100));
+        criticalDamage += playerStatsManager.GetStatValue(Stat.CriticalDamage);
+
+        range += playerStatsManager.GetStatValue(Stat.Range) / 10;
     }
 }
