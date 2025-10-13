@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public abstract class Weapon : MonoBehaviour, IPlayerStatsDependency
 {
+    [field: SerializeField] public WeaponDataSO weaponData { get; private set; }
+
     [Header("Settings")]
     [SerializeField] private float range;
     [SerializeField] protected LayerMask enemyMask;
 
     [Header("Attack")]
-    [SerializeField] protected int damage;
+    [SerializeField] protected int baseDamage;
+    protected int damage;
     [SerializeField] protected float attackDelay;
     [SerializeField] protected Animator anim;
 
@@ -21,7 +24,7 @@ public class Weapon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       
+        damage = baseDamage;
     }
 
     // Update is called once per frame
@@ -75,4 +78,7 @@ public class Weapon : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, range);
 
     }
+
+    public abstract void UpdateStats(PlayerStatsManager playerStatsManager);
+   
 }
