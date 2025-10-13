@@ -116,4 +116,17 @@ public class MeleeWeapon : Weapon
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(hitBoxTransform.position, hitBoxRadius);
     }
+
+    public override void UpdateStats(PlayerStatsManager playerStatsManager)
+    {
+     
+        ConfigureStats();
+
+        damage = (int)(damage * (1 + playerStatsManager.GetStatValue(Stat.Attack) / 100));
+        attackDelay /= 1 + (playerStatsManager.GetStatValue(Stat.AttackSpeed) / 100);
+
+        criticalChance = Mathf.RoundToInt(criticalChance * (1 + playerStatsManager.GetStatValue(Stat.CriticalChance) / 100));
+        criticalDamage += playerStatsManager.GetStatValue(Stat.CriticalDamage);
+    }
 }
+
