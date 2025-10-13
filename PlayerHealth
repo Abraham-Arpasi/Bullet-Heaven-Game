@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 
+using Random = UnityEngine.Random;
 public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
 {
     [Header("Settings")]
@@ -14,10 +15,14 @@ public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
     private float maxHealth;
     private float armour;
     private float lifeSteal;
+    private float dodge;
 
     [Header("Elements")]
     [SerializeField] private Slider healthBar;
     [SerializeField] private TextMeshProUGUI healthText;
+
+    [Header("Actions")]
+    public static Action<Vector2> onAttackDodged;
 
     private void Awake()
     {
@@ -44,7 +49,7 @@ public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
     // Start is called before the first frame update
     void Start()
     {
-        healthText.text = health + " / " + maxHealth;
+        healthText.text = (int)health + " / " + maxHealth;
         Debug.Log("Health initalized to : " + health);
     }
 
@@ -57,6 +62,12 @@ public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
 
     public void TakeDamage(int damage)
     {
+        if (ShouldDodge())
+        {
+            onAttackDodged?.Invoke(transform.position);
+            return;
+        }
+
         float realDamage = damage * Mathf.Clamp(1 - (armour / 1000), 0, 10000); Mathf.Min(damage, health);
         realDamage = Mathf.Min(realDamage, health);
         health -= realDamage;
@@ -72,6 +83,12 @@ public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
             Dead();
         }
     }
+
+    private bool ShouldDodge()
+    {
+        return Random.Range(0f, 100f) < dodge;
+    }
+
     private void Dead()
     {
         GameManager.instance.SetGameState(GameState.GAMEOVER);
@@ -87,5 +104,7 @@ public class PlayerHealth : MonoBehaviour, IPlayerStatsDependency
         healthBar.value = 1;
 
         armour = playerStatsManager.GetStatValue(Stat.Armour);
+        lifeSteal = playerStatsManager.GetStatValue(Stat.LifeSteal) / 100;
+        dodge = playerStatsManager.GetStatValue (Stat.Dodge);
     }
 }
