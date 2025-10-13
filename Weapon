@@ -7,24 +7,29 @@ public abstract class Weapon : MonoBehaviour, IPlayerStatsDependency
     [field: SerializeField] public WeaponDataSO weaponData { get; private set; }
 
     [Header("Settings")]
-    [SerializeField] private float range;
+    [SerializeField] protected float range;
     [SerializeField] protected LayerMask enemyMask;
 
     [Header("Attack")]
-    [SerializeField] protected int baseDamage;
-    protected int damage;
+    [SerializeField] protected int damage;
     [SerializeField] protected float attackDelay;
     [SerializeField] protected Animator anim;
 
     protected float attackTimer;
 
+    [Header("Critical")]
+    protected int criticalChance;
+    protected float criticalDamage;
+
     [Header("Animations")]
     [SerializeField] protected float aimLerp;
+
+    [field: SerializeField] public int level {  get; private set; } 
     
     // Start is called before the first frame update
     void Start()
     {
-        damage = baseDamage;
+        
     }
 
     // Update is called once per frame
@@ -63,10 +68,10 @@ public abstract class Weapon : MonoBehaviour, IPlayerStatsDependency
     {
         isCriticalHit = false;
 
-        if (Random.Range(0, 100) <= 50)
+        if (Random.Range(0, 101) <= criticalChance)
         {
             isCriticalHit = true;
-            return damage * 2;
+            return Mathf.RoundToInt(damage * criticalDamage);
         }
 
         return damage;
@@ -80,5 +85,18 @@ public abstract class Weapon : MonoBehaviour, IPlayerStatsDependency
     }
 
     public abstract void UpdateStats(PlayerStatsManager playerStatsManager);
+
+    protected void ConfigureStats()
+    {
+        float multiplier = 1 + (float)level / 3;
+        damage = Mathf.RoundToInt(weaponData.GetStatValue(Stat.Attack) * multiplier);
+        attackDelay = 1f / (weaponData.GetStatValue(Stat.AttackSpeed) * multiplier);
+
+        criticalChance = Mathf.RoundToInt(weaponData.GetStatValue(Stat.CriticalChance) * multiplier);
+        criticalDamage = weaponData.GetStatValue(Stat.CriticalDamage) * multiplier;
+
+        if(weaponData.Prefab.GetType() == typeof(RangeWeapon))
+            range = weaponData.GetStatValue(Stat.Range) * multiplier;
+    }
    
 }
