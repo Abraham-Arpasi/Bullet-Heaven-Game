@@ -11,6 +11,21 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
     [Header("Elements")]
     [SerializeField] private PlayerStatsManager playerStatsManager;
     [SerializeField] private UpgradeContainer[] upgradeContainers;
+
+    [Header("Settings")]
+    private int chestsCollected;
+
+    private void Awake()
+    {
+        Chest.onCollected += ChestCollectedCallback;
+    }
+
+
+    private void OnDestroy()
+    {
+        Chest.onCollected -= ChestCollectedCallback;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +46,23 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
                 ConfigureUpgradeContainers();
                 break;
         }
+    }
+
+    private void TryOpenChests()
+    {
+        if(chestsCollected > 0)
+        {
+            ShowObject();
+        }
+        else
+        {
+            ConfigureUpgradeContainers();
+        }
+    }
+
+    private void ShowObject()
+    {
+        Debug.Log("Showing Chest");
     }
 
     private void ConfigureUpgradeContainers()
@@ -57,6 +89,9 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
 
     private void BonusSelectedCallback()
     {
+        Player.instance.playerLevel.WaveTransitionCompleted();
+
+        // Resume gameplay
         GameManager.instance.WaveCompletedCallback();
     }
 
@@ -68,7 +103,7 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
         switch (stat)
         {
             case Stat.Attack:
-                value = Random.Range(1, 10);
+                value = Random.Range(1, 5);
                 buttonString = "+" + value.ToString() + "%";
                 break;
 
@@ -78,7 +113,7 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
                 break;
 
             case Stat.MaxHealth:
-                value = Random.Range(10, 50);
+                value = Random.Range(5, 10);
                 buttonString = "+" + value;
                 break;
 
@@ -88,7 +123,7 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
                 break;
 
             case Stat.AttackSpeed:
-                value = Random.Range(1, 10);
+                value = Random.Range(1, 5);
                 buttonString = "+" + value.ToString() + "%";
                 break;
 
@@ -106,12 +141,12 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
                 value = Random.Range(1, 10);
                 buttonString = "+" + value.ToString() + "%";
                 break;
-
+/*
             case Stat.Armour:
                 value = Random.Range(1, 10);
                 buttonString = "+" + value.ToString() + "%";
                 break;
-
+*/
             case Stat.Luck:
                 value = Random.Range(1, 10);
                 buttonString = "+" + value.ToString() + "%";
@@ -134,4 +169,12 @@ public class WaveTransitionManager : MonoBehaviour, IGameStateListener
 
         return () => playerStatsManager.AddPlayerStat(stat, value);
     }
+
+    private void ChestCollectedCallback()
+    {
+        chestsCollected++;
+        Debug.Log("Collected chest");
+        TryOpenChests();
+    }
+
 }
