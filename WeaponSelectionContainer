@@ -12,17 +12,18 @@ public class WeaponSelectionContainer : MonoBehaviour
 
     [Header("Stats")]
     [SerializeField] private Transform statContainersParent;
-    [SerializeField] private Sprite statIcon;
+    //[SerializeField] private Sprite statIcon;
 
     [field: SerializeField] public Button Button { get; private set; }
 
     [Header("Colour")]
     [SerializeField] private Image[] levelDependentImages;
 
-    public void Configure(Sprite sprite, string name, int level, WeaponDataSO weaponData)
+
+    public void Configure(WeaponDataSO weaponData, int level)
     {
-        icon.sprite = sprite;
-        nameText.text = name + " (lvl " + (level + 1) + ")";
+        icon.sprite = weaponData.sprite;
+        nameText.text = weaponData.Name + " (lvl " + (level + 1) + ")";
         /*
         Color imageColor;
 
@@ -63,6 +64,8 @@ public class WeaponSelectionContainer : MonoBehaviour
     {
         LeanTween.cancel(gameObject);
         LeanTween.scale(gameObject, Vector3.one * 1.075f, 0.3f).setEase(LeanTweenType.easeInOutSine);
+
+        GameManager.instance.SetWeaponSelected(true);
     }
 
     public void Deselect()
