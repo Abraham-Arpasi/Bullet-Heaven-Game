@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    private bool weaponSelected = false;
 
     private void Awake()
     {
@@ -25,7 +27,32 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        if (!weaponSelected)
+        {
+            Debug.LogWarning("Cannot start game — no weapon selected!");
+            return;
+        }
+
         SetGameState(GameState.GAME);
+    }
+
+    public void StartWave()
+    {
+        // Reset level-up transition flag for the new wave
+        Player.instance.playerLevel.NewWaveStarted();
+
+        // Set game state to gameplay
+        SetGameState(GameState.GAME);
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void SetWeaponSelected(bool selected)
+    {
+        weaponSelected = selected;
     }
 
     public void StartWeaponSelection()
@@ -52,20 +79,22 @@ public class GameManager : MonoBehaviour
         foreach(IGameStateListener gameStateListener in gameStateListeners)
             gameStateListener.GameStateChangedCallback(gameState);
 
+        if (gameState == GameState.WAVETRANSITION || gameState == GameState.CHESTTRANSITION)
+        {
+            Time.timeScale = 0f; // freeze game
+        }
+        else
+        {
+            Time.timeScale = 1f; // resume game
+        }
+
         if (gameState == GameState.GAMEOVER)
             ManageGameover();
     }
 
     public void WaveCompletedCallback()
     {
-        if (Player.instance.HasLeveledUp())
-        {
-            SetGameState(GameState.WAVETRANSITION);
-        }
-        else
-        {
-            SetGameState(GameState.SHOP);
-        }
+        SetGameState(GameState.GAME);
     }
 
     public void ManageGameover()
