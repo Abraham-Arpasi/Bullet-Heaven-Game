@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 [CreateAssetMenu(fileName = "Object Data", menuName = "Scriptable Objects/New Object", order = 0)]
 public class ObjectDataSO : ScriptableObject
@@ -8,6 +10,7 @@ public class ObjectDataSO : ScriptableObject
     [field: SerializeField] public string Name { get; private set; }
     [field: SerializeField] public Sprite Icon { get; private set; }
     [field: SerializeField] public int Price { get; private set; }
+    [field: SerializeField] public int RecyclePrice { get; private set; }
 
     [field: Range(0,3)]
     [field: SerializeField] public int Rarity { get; private set; }
@@ -29,7 +32,7 @@ public class ObjectDataSO : ScriptableObject
     {
         get
         {
-            return new Dictionary<Stat, float>
+            var stats = new Dictionary<Stat, float>
             {
                 {Stat.Attack, attack },
                 {Stat.AttackSpeed, attackSpeed },
@@ -44,8 +47,13 @@ public class ObjectDataSO : ScriptableObject
                 //{Stat.Dodge, dodge },
                 {Stat.LifeSteal, luck },
             };
+
+            return stats
+               .Where(s => s.Value != 0 )
+               .ToDictionary(s => s.Key, s => s.Value);
         }
 
         private set { }
     }
 }
+
