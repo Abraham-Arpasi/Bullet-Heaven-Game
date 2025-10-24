@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour, IGameStateListener
     [SerializeField] private GameObject waveTransitionPanel;
     [SerializeField] private GameObject shopPanel;
     [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject chestTransitionPanel;
 
     private List <GameObject> panels = new List<GameObject>();
 
@@ -27,7 +28,8 @@ public class UIManager : MonoBehaviour, IGameStateListener
             stagecompletePanel,
             waveTransitionPanel,
             shopPanel,
-            pausePanel
+            pausePanel,
+            chestTransitionPanel,
         });
     }
 
@@ -77,6 +79,10 @@ public class UIManager : MonoBehaviour, IGameStateListener
 
             case GameState.PAUSE:
                 ShowPanel(pausePanel, false);
+                break;
+
+            case GameState.CHESTTRANSITION:
+                ShowPanel(chestTransitionPanel);
                 break;
         }
     }
