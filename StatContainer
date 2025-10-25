@@ -11,11 +11,39 @@ public class StatContainer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI statText;
     [SerializeField] private TextMeshProUGUI statValueText;
 
-    public void Configure(Sprite icon, string statName, string statValue)
+    public void Configure(Sprite icon, string statName, float statValue, bool useColor = false)
     {
         statImage.sprite = icon;
         statText.text = statName;
-        statValueText.text = statValue;
+
+        if (useColor)
+            ColorizeStatValueText(statValue);
+        else
+        {
+            statValueText.color = Color.black;
+            statValueText.text = statValue.ToString("F0");
+        }
+
+    }
+
+    private void ColorizeStatValueText(float statValue)
+    {
+        float sign = Mathf.Sign(statValue);
+
+        if (statValue == 0)
+            sign = 0;
+
+        float absStatValue = Mathf.Abs(statValue);
+
+        Color statValueTextColor = Color.black;
+
+        if (sign > 0)
+            statValueTextColor = Color.green;
+        else if (sign < 0)
+            statValueTextColor = Color.red;
+
+        statValueText.color = statValueTextColor;
+        statValueText.text = statValue.ToString("F0");
     }
 
     public float GetFontSize()
