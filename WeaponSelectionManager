@@ -74,4 +74,9 @@ public class WeaponSelectionManager : MonoBehaviour, IGameStateListener
                 container.Deselect();
         }
     }
+
+    public void Reroll()
+    {
+        Configure();
+    }
 }
