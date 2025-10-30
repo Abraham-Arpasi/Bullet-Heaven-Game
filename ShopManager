@@ -1,0 +1,58 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+public class ShopManager : MonoBehaviour, IGameStateListener
+{
+    [Header("Elements")]
+    [SerializeField] private Transform containersParent;
+    [SerializeField] private ShopItemContainer shopItemContainerPrefab;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public void GameStateChangedCallback(GameState gameState)
+    {
+        if(gameState == GameState.CHESTTRANSITION)
+        {
+            Configure();
+        }
+    }
+
+    private void Configure()
+    {
+        containersParent.Clear();
+
+        int containersToAdd = 3;
+        int weaponContainerCount = Random.Range(Mathf.Min(1, containersToAdd), containersToAdd);
+        int objectContainerCount = containersToAdd - weaponContainerCount;
+
+        for (int i = 0; i < weaponContainerCount; i++)
+        {
+            ShopItemContainer weaponContainerInstance = Instantiate(shopItemContainerPrefab, containersParent);
+            weaponContainerInstance.name = "Weapon Container";
+            WeaponDataSO randomWeapon = ResourcesManager.GetRandomWeapon();
+            weaponContainerInstance.Configure(randomWeapon, Random.Range(0, 2));
+
+        }
+
+        for (int i = 0; i < objectContainerCount; i++)
+        {
+            ShopItemContainer objectContainerInstance = Instantiate(shopItemContainerPrefab, containersParent);
+            objectContainerInstance.name = "Object Container";
+            ObjectDataSO randomObject = ResourcesManager.GetRandomObject();
+
+            objectContainerInstance.Configure(randomObject);
+        }
+    }
+}
