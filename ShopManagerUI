@@ -1,0 +1,42 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ShopManagerUI : MonoBehaviour
+{
+    [Header("Player Stats Elements")]
+    [SerializeField] private RectTransform playerStatsPanel;
+    [SerializeField] private GameObject playerStatsClosePanel;
+
+    // Start is called before the first frame update
+    IEnumerator Start()
+    {
+        yield return null;
+
+        ConfigurePlayerStatsPanel();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    private void ConfigurePlayerStatsPanel()
+    {
+        float width = Screen.width / 4;
+        playerStatsPanel.offsetMax = playerStatsPanel.offsetMax.With(x: width);
+    }
+
+    public void ShowPlayerStats()
+    {
+        playerStatsPanel.gameObject.SetActive(true);
+        playerStatsClosePanel.SetActive(true);
+    }
+
+    public void HidePlayerStats()
+    {
+        playerStatsPanel.gameObject.SetActive(false);
+        playerStatsClosePanel.SetActive(false);
+    }
+}
