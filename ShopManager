@@ -9,6 +9,20 @@ public class ShopManager : MonoBehaviour, IGameStateListener
     [SerializeField] private Transform containersParent;
     [SerializeField] private ShopItemContainer shopItemContainerPrefab;
 
+    [Header("Player Components")]
+    [SerializeField] private PlayerWeapons playerWeapons;
+    [SerializeField] private PlayerObjects playerObjects;
+
+    private void Awake()
+    {
+        ShopItemContainer.onPurchased += ItemPurchasedCallback;
+    }
+
+    private void OnDestroy()
+    {
+        ShopItemContainer.onPurchased -= ItemPurchasedCallback;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -54,5 +68,35 @@ public class ShopManager : MonoBehaviour, IGameStateListener
 
             objectContainerInstance.Configure(randomObject);
         }
+    }
+
+    private void ResumeGame()
+    {
+        GameManager.instance.SetGameState(GameState.GAME);
+    }
+
+    private void ItemPurchasedCallback(ShopItemContainer container, int weaponLevel)
+    {
+
+        if (container.WeaponData != null)
+            TryPurchaseWeapon(container, weaponLevel);
+        else
+            PurchaseObject(container);
+
+    }
+
+    private void TryPurchaseWeapon(ShopItemContainer container, int weaponLevel)
+    {
+        if(playerWeapons.TryAddWeapon(container.WeaponData, weaponLevel))
+        {
+            ResumeGame();
+        }
+    }
+
+    private void PurchaseObject(ShopItemContainer container)
+    {
+        playerObjects.AddObject(container.ObjectData);
+
+        ResumeGame();
     }
 }
