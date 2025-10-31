@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class ShopItemContainer : MonoBehaviour
 {
@@ -19,30 +20,51 @@ public class ShopItemContainer : MonoBehaviour
     [Header("Colour")]
     [SerializeField] private Image[] levelDependentImages;
 
+    //[Header("Purchasing")]
+    public WeaponDataSO WeaponData { get; private set; }
+    public ObjectDataSO ObjectData { get; private set; }
+    private int weaponLevel;
+
+    [Header("Actions")]
+    public static Action<ShopItemContainer, int> onPurchased;
 
     public void Configure(WeaponDataSO weaponData, int level)
     {
+        weaponLevel = level;
+        WeaponData = weaponData;
+
         icon.sprite = weaponData.sprite;
         nameText.text = weaponData.Name + " (lvl " + (level + 1) + ")";
 
         Dictionary<Stat, float> calculatedStats = WeaponStatsCalculator.GetStats(weaponData, level);
 
         ConfigureStatContainers(calculatedStats);
+
+        PurchaseButton.onClick.AddListener(Purchase);
     }
 
     public void Configure(ObjectDataSO objectData)
     {
+        ObjectData = objectData;
+
         icon.sprite = objectData.Icon;
         nameText.text = objectData.Name + " (lvl " + (objectData.Rarity + 1) + ")";
 
        // Dictionary<Stat, float> calculatedStats = WeaponStatsCalculator.GetStats(objectData.Rarity);
 
         ConfigureStatContainers(objectData.BaseStats);
+
+        PurchaseButton.onClick.AddListener(Purchase);
     }
 
     private void ConfigureStatContainers(Dictionary<Stat, float> stats)
     {
         statContainersParent.Clear();
         StatContainerManager.GenerateStatContainers(stats, statContainersParent);
+    }
+
+    private void Purchase()
+    {
+        onPurchased?.Invoke(this, weaponLevel);
     }
 }
