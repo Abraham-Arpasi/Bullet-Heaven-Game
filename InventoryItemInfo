@@ -1,0 +1,34 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using UnityEngine.UI;
+
+public class InventoryItemInfo : MonoBehaviour
+{
+    [Header("Elements")]
+    [SerializeField] private Image icon;
+    [SerializeField] private TextMeshProUGUI itemNameText;
+    //[SerializeField] private TextMeshProUGUI recyclePriceText;
+
+    [Header("Stats")]
+    [SerializeField] private Transform statsParent;
+
+    public void Configure(Weapon weapon)
+    {
+        Configure(weapon.weaponData.sprite, weapon.weaponData.Name + "(lvl: " + (weapon.level + 1) + ")", WeaponStatsCalculator.GetStats(weapon.weaponData, weapon.level));
+    }
+
+    public void Configure(ObjectDataSO objectData)
+    {
+        Configure(objectData.Icon, objectData.Name, objectData.BaseStats);
+    }
+
+    private void Configure(Sprite itemIcon, string name, Dictionary<Stat, float> stats)
+    {
+        icon.sprite = itemIcon;
+        itemNameText.text = name;
+
+        StatContainerManager.GenerateStatContainers(stats, statsParent);
+    }
+}
