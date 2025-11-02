@@ -28,7 +28,7 @@ public class StatContainerManager : MonoBehaviour
 
             Sprite icon = ResourcesManager.GetStatIcon(kvp.Key);
             string statName = Enums.FormatStatName(kvp.Key);
-            string statValue = kvp.Value.ToString("");
+            float statValue = kvp.Value;
 
             containerInstance.Configure(icon, statName, statValue);
         }
@@ -59,6 +59,7 @@ public class StatContainerManager : MonoBehaviour
 
     public static void GenerateStatContainers(Dictionary<Stat, float> statDictionary, Transform parent)
     {
+        parent.Clear();
         instance.GenerateContainer(statDictionary, parent);
     }
 }
