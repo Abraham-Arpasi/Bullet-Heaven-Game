@@ -15,6 +15,16 @@ public class InventoryManager : MonoBehaviour, IGameStateListener
     [SerializeField] private ShopManagerUI shopManagerUI;
     [SerializeField] private InventoryItemInfo itemInfo;
 
+    private void Awake()
+    {
+        WeaponMerger.onMerge += WeaponMergedCallback;
+    }
+
+    private void OnDestroy()
+    {
+        WeaponMerger.onMerge -= WeaponMergedCallback;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,9 +51,12 @@ public class InventoryManager : MonoBehaviour, IGameStateListener
 
         for (int i = 0; i < weapons.Length; i++)
         {
+            if (weapons[i] == null)
+                continue;
+
             InventoryItemContainer container = Instantiate(inventoryItemContainer, inventoryItemsParent);
 
-            container.Configure(weapons[i], () => ShowItemInfo(container));
+            container.Configure(weapons[i], i, () => ShowItemInfo(container));
         }
 
         ObjectDataSO[] objectDatas = playerObjects.Objects.ToArray();
@@ -60,7 +73,7 @@ public class InventoryManager : MonoBehaviour, IGameStateListener
     {
        if(container.Weapon != null)
         {
-            ShowWeaponInfo(container.Weapon);
+            ShowWeaponInfo(container.Weapon, container.Index);
         }
         else
         {
@@ -68,7 +81,7 @@ public class InventoryManager : MonoBehaviour, IGameStateListener
         }
     }
 
-    private void ShowWeaponInfo(Weapon weapon)
+    private void ShowWeaponInfo(Weapon weapon, int index)
     {
         itemInfo.Configure(weapon);
         shopManagerUI.ShowItemInfo();
@@ -78,6 +91,12 @@ public class InventoryManager : MonoBehaviour, IGameStateListener
     {
         itemInfo.Configure(objectData);
         shopManagerUI.ShowItemInfo();
+    }
+
+    private void WeaponMergedCallback(Weapon mergedWeapon)
+    {
+        Configure();
+        itemInfo.Configure(mergedWeapon);
     }
 
    }
