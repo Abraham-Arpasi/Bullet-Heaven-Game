@@ -91,15 +91,21 @@ public abstract class Weapon : MonoBehaviour, IPlayerStatsDependency
         Dictionary<Stat, float> calculatedStats = WeaponStatsCalculator.GetStats(weaponData, level);
 
         damage = Mathf.RoundToInt(calculatedStats[Stat.Attack]);
+
         attackDelay = 1f / calculatedStats[Stat.AttackSpeed];
         criticalChance = Mathf.RoundToInt(calculatedStats[Stat.CriticalChance]);
         criticalDamage = calculatedStats[Stat.CriticalDamage];
         range = calculatedStats[Stat.Range];
     }
-    
+
     public void UpgradeTo(int targetLevel)
     {
         level = targetLevel;
         ConfigureStats();
+    }
+
+    public void Upgrade()
+    {
+        UpgradeTo(level + 1);
     }
 }
