@@ -1,0 +1,120 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Tabsil.Sijil;
+
+public class SettingsManager : MonoBehaviour, IWantToBeSaved
+{
+    [Header("Elements")]
+    [SerializeField] private Button sfxButton;
+    [SerializeField] private Button musicButton;
+
+    [Header("Settings")]
+    [SerializeField] private Color onColor;
+    [SerializeField] private Color offColor;
+
+    [Header("Data")]
+    private bool sfxState;
+    private bool musicState;
+
+    private void Awake()
+    {
+        sfxButton.onClick.RemoveAllListeners();
+        sfxButton.onClick.AddListener(SFXButtonCallback);
+
+        musicButton.onClick.RemoveAllListeners();
+        musicButton.onClick.AddListener(MusicButtonCallback);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    private void SFXButtonCallback()
+    {
+        sfxState = !sfxState;
+
+        UpdateSFXVisuals();
+
+        Save();
+    }
+
+    private void UpdateSFXVisuals()
+    {
+        Color c = sfxButton.image.color;
+        c.a = 1f;
+        sfxButton.image.color = c;
+
+        if (sfxState)
+        {
+            sfxButton.image.color = new Color(onColor.r, onColor.g, onColor.b, 1f);
+            sfxButton.GetComponentInChildren<TextMeshProUGUI>().text = "ON";
+            
+        }
+        else
+        {
+            sfxButton.image.color = new Color(offColor.r, offColor.g, offColor.b, 1f);
+            sfxButton.GetComponentInChildren<TextMeshProUGUI>().text = "OFF";
+        }
+    }
+
+    private void MusicButtonCallback()
+    {
+        musicState = !musicState;
+
+        UpdateMusicVisuals();
+
+        Save();
+    }
+
+    private void UpdateMusicVisuals()
+    {
+        Color c = musicButton.image.color;
+        c.a = 1f;
+        musicButton.image.color = c;
+
+        if (musicState)
+        {
+            musicButton.image.color = new Color(onColor.r, onColor.g, onColor.b, 1f);
+            musicButton.GetComponentInChildren<TextMeshProUGUI>().text = "ON";
+
+        }
+        else
+        {
+            musicButton.image.color = new Color(offColor.r, offColor.g, offColor.b, 1f);
+            musicButton.GetComponentInChildren<TextMeshProUGUI>().text = "OFF";
+        }
+    }
+
+    public void Load()
+    {
+        sfxState = true;
+        musicState = true;
+
+        if (Sijil.TryLoad(this, "sfx", out object sfxStateObject))
+            sfxState = (bool)sfxStateObject;
+
+        if(Sijil.TryLoad(this, "music", out object musicStateObject))
+            musicState = (bool)musicStateObject;
+
+        UpdateSFXVisuals();
+        UpdateMusicVisuals();
+    }
+
+    public void Save()
+    {
+        Sijil.Save(this, "sfx", sfxState);
+        Sijil.Save(this, "music", musicState);
+    }
+}
