@@ -4,11 +4,16 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     private bool weaponSelected = false;
+
+    [Header("Actions")]
+    public static Action onGamePaused;
+    public static Action onGameResume;
 
     private void Awake()
     {
@@ -23,6 +28,12 @@ public class GameManager : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         SetGameState(GameState.MENU);
+    }
+
+    public void MainMenu()
+    {
+        Time.timeScale = 1;
+        ManageGameover();
     }
 
     public void StartGame()
@@ -99,7 +110,21 @@ public class GameManager : MonoBehaviour
 
     public void ManageGameover()
     {
-        LeanTween.delayedCall(2, () => SceneManager.LoadScene(0));
+        SceneManager.LoadScene(0);
+    }
+
+    public void PauseButtonCallback()
+    {
+        SetGameState(GameState.PAUSE);
+        Time.timeScale = 0;
+        //onGamePaused?.Invoke();
+    }
+
+    public void ResumeButtonCallback()
+    {
+        SetGameState(GameState.GAME);
+        Time.timeScale = 1;
+       // onGameResume?.Invoke();
     }
 }
 
