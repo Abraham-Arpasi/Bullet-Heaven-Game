@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour, IGameStateListener
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject chestTransitionPanel;
     [SerializeField] private GameObject restartConfirmationPanel;
+    [SerializeField] private GameObject settingsPanel;
 
     private List <GameObject> panels = new List<GameObject>();
 
@@ -31,6 +32,7 @@ public class UIManager : MonoBehaviour, IGameStateListener
             shopPanel,
             pausePanel,
             chestTransitionPanel,
+            settingsPanel,
         });
     }
 
@@ -80,11 +82,17 @@ public class UIManager : MonoBehaviour, IGameStateListener
 
             case GameState.PAUSE:
                 ShowPanel(pausePanel, false);
+                FindObjectOfType<InventoryManager>().Configure();
                 break;
 
             case GameState.CHESTTRANSITION:
                 ShowPanel(chestTransitionPanel);
                 break;
+
+            case GameState.SETTINGS:
+                ShowPanel(settingsPanel, false);
+                break;
+
         }
     }
 
@@ -115,5 +123,15 @@ public class UIManager : MonoBehaviour, IGameStateListener
     public void HideRestartConfirmationPanel()
     {
         restartConfirmationPanel.SetActive(false);
+    }
+
+    public void ShowSettings()
+    {
+        settingsPanel.SetActive(true);
+    }
+
+    public void HideSettings()
+    {
+        settingsPanel.SetActive(false);
     }
 }
