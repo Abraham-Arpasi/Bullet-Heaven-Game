@@ -12,7 +12,8 @@ public enum GameState
     WAVETRANSITION,
     SHOP,
     PAUSE,
-    CHESTTRANSITION
+    CHESTTRANSITION,
+    SETTINGS
 }
 
 public enum Stat
