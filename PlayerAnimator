@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerAnimator : MonoBehaviour
+{
+    [Header("Elements")]
+    [SerializeField] private Animator anim;
+    private Rigidbody2D rig;
+
+    private void Awake()
+    {
+        rig = GetComponent<Rigidbody2D>();
+    }
+
+    private void FixedUpdate()
+    {
+        if (rig.velocity.magnitude < 0.001)
+            anim.Play("idle");
+        else
+            anim.Play("Move");
+    }
+}
